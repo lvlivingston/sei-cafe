@@ -8,8 +8,10 @@ import CategoryList from '../../components/CategoryList/CategoryList';
 import OrderDetail from '../../components/OrderDetail/OrderDetail';
 import UserLogOut from '../../components/UserLogOut/UserLogOut';
 
-export default function NewOrderPage() {
+export default function NewOrderPage({ user, setUser }) {
   const [menuItems, setMenuItems] = useState([]);
+  // Add state to track the "active" category 
+  const [activeCat, setActiveCat] = useState('');
   // Create and initialize the ref to an empty array
   const categoriesRef = useRef([]);
 
@@ -22,11 +24,27 @@ export default function NewOrderPage() {
       // Remove dups of category names using a Set, then spread Set back into an array literal
       categoriesRef.current = [...new Set(items.map(item => item.category.name))];
       setMenuItems(items);
+      setActiveCat(categoriesRef.current[0]);
     }
     getItems();
   }, []);
   
   return (
-    <h1>NewOrderPage</h1>
+    <main className="NewOrderPage">
+      <aside>
+        <Logo />
+        <CategoryList
+          categories={categoriesRef.current}
+          activeCat={activeCat}
+          setActiveCat={setActiveCat}
+        />
+        <Link to="/orders" className="button btn-sm">PREVIOUS ORDERS</Link>
+        <UserLogOut user={user} setUser={setUser} />
+      </aside>
+      <MenuList
+        menuItems={menuItems.filter(item => item.category.name === activeCat)}
+      />
+      <OrderDetail />
+    </main>
   );
 }
